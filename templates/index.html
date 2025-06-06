@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            color: #111111;
+            padding-top: 60px; /* Add padding to account for fixed navbar */
+        }
+
+        /* Navigation bar */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0; /* Ensure the navbar is aligned to the left */
+            width: 100%;
+            background: #ffffff;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: #111111;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #333333;
+        }
+
+        /* Product sections */
+        .section {
+            padding: 40px 20px;  /* Adjusted padding */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section:first-of-type {
+            margin-top: 20px; /* Add space for the first section */
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2em;
+            color: #111111;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .product-card {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #eee; /* Placeholder color */
+        }
+
+        .product-image.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            color: #111111;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: #111111;
+            margin-bottom: 15px;
+        }
+
+        .buy-button {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .buy-button:hover {
+            background: #333333;
+        }
+
+        /* Chat widget styles (existing) */
+        #chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* Chat header */
+        .chat-header {
+            background: #2196F3;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-chat {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Chat messages container */
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        /* Individual message styles */
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            margin-left: auto;
+            background: #E3F2FD;
+            padding: 10px;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .bot-message {
+            background: #F5F5F5;
+            padding: 10px;
+            border-radius: 15px 15px 15px 0;
+        }
+
+        /* Input area */
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        #send-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background: #1976D2;
+        }
+
+        /* Chat toggle button */
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2196F3;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
+
+        #chat-toggle:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <ul class="nav-links">
+            <li><a href="#shoes">Shoes</a></li>
+            <li><a href="#hoodies">Hoodies</a></li>
+            <li><a href="#tshirts">T-Shirts</a></li>
+            <li><a href="#accessories">Accessories</a></li>
+        </ul>
+    </nav>
+
+    <!-- Shoes Section -->
+    <section id="shoes" class="section">
+        <h2 class="section-title">Shoes</h2>
+        <div class="products-grid">
+            {% for shoe in products.shoes %}
+            <div class="product-card">
+                <div class="product-image placeholder">
+                    {{ shoe.name }}
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">{{ shoe.name }}</h3>
+                    <p class="product-price">€{{ "%.2f"|format(shoe.price) }}</p>
+                    <a href="#" class="buy-button">Add to Cart</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Hoodies Section -->
+    <section id="hoodies" class="section">
+        <h2 class="section-title">Hoodies</h2>
+        <div class="products-grid">
+            {% for hoodie in products.hoodies %}
+            <div class="product-card">
+                <div class="product-image placeholder">
+                    {{ hoodie.name }}
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">{{ hoodie.name }}</h3>
+                    <p class="product-price">€{{ "%.2f"|format(hoodie.price) }}</p>
+                    <a href="#" class="buy-button">Add to Cart</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- T-Shirts Section -->
+    <section id="tshirts" class="section">
+        <h2 class="section-title">T-Shirts</h2>
+        <div class="products-grid">
+            {% for tshirt in products.tshirts %}
+            <div class="product-card">
+                <div class="product-image placeholder">
+                    {{ tshirt.name }}
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">{{ tshirt.name }}</h3>
+                    <p class="product-price">€{{ "%.2f"|format(tshirt.price) }}</p>
+                    <a href="#" class="buy-button">Add to Cart</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Accessories Section -->
+    <section id="accessories" class="section">
+        <h2 class="section-title">Accessories</h2>
+        <div class="products-grid">
+            {% for accessory in products.accessories %}
+            <div class="product-card">
+                <div class="product-image placeholder">
+                    {{ accessory.name }}
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">{{ accessory.name }}</h3>
+                    <p class="product-price">€{{ "%.2f"|format(accessory.price) }}</p>
+                    <a href="#" class="buy-button">Add to Cart</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Chat widget (existing) -->
+    <div id="chat-toggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <div id="chat-widget">
+        <div class="chat-header">
+            <span>Chat Bot</span>
+            <span class="close-chat">&times;</span>
+        </div>
+        <div class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Kirjoita viesti...">
+            <button id="send-button">Lähetä</button>
+        </div>
+    </div>
+
+    <!-- Your existing chat script -->
+    <script>
+        // Generate a random conversation ID
+        const conversationId = Math.random().toString(36).substring(7);
+        
+        // Chat widget toggle
+        const chatToggle = document.getElementById('chat-toggle');
+        const chatWidget = document.getElementById('chat-widget');
+        const closeChat = document.querySelector('.close-chat');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.querySelector('.chat-messages');
+
+        // Toggle chat widget
+        chatToggle.addEventListener('click', () => {
+            chatWidget.style.display = 'block';
+            chatToggle.style.display = 'none';
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatWidget.style.display = 'none';
+            chatToggle.style.display = 'flex';
+        });
+
+        // Send message function
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            messageInput.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversation_id: conversationId
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Add bot response to chat
+                addMessage(data.response, 'bot');
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Pahoittelen, mutta tapahtui virhe. Yritä uudelleen.', 'bot');
+            }
+        }
+
+        // Add message to chat
+        function addMessage(message, type) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', `${type}-message`);
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Add welcome message
+        addMessage('Hei! Miten voin auttaa sinua tänään?', 'bot');
+    </script>
+</body>
+</html> 
